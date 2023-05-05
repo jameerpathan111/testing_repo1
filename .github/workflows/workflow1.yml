@@ -1,0 +1,36 @@
+# Update robottelo image on quay.
+name: update_robottelo_image
+
+on:
+  push:
+    branches:
+      - main
+      - test
+  repository_dispatch:
+    types:
+      - airgun-pr-merged
+      - nailgun-pr-merged
+
+jobs:
+  robottelo_container:
+    name: Update Robottelo container image on Quay.
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+
+      - name: Get image tag
+        id: image_tag
+        run: |
+          TAG="${{ github.event.client_payload.tag }}"
+          if [ -z "$TAG" ]; then
+            TAG="${GITHUB_REF##*/}"
+          fi
+          TAG=${TAG/master/latest}
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT\
+
+      - name: assert
+        run: |
+          echo "IMAGE_TAG: ${{ steps.image_tag.outputs.IMAGE_TAG }}"
+          echo "client_payload_tag: "${{ github.event.client_payload.tag }}"
