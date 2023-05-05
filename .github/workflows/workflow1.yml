@@ -27,10 +27,10 @@ jobs:
           if [ -z "$TAG" ]; then
             TAG="${GITHUB_REF##*/}"
           fi
-          TAG=${TAG/master/latest}
+          TAG=${TAG/main/latest}
           echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT\
 
       - name: assert
         run: |
-          echo "IMAGE_TAG: ${{ steps.image_tag.outputs.IMAGE_TAG }}"
-          echo "client_payload_tag: "${{ github.event.client_payload.tag }}"
+          echo "IMAGE_TAG: $steps.image_tag.outputs.IMAGE_TAG"
+          echo "client_payload_tag: $github.event.client_payload.tag"
