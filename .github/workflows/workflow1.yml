@@ -17,20 +17,28 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Get image tag
-        id: image_tag
+      - name: Get tag
+        id: repo_tag
         run: |
           TAG="${{ github.event.client_payload.tag }}"
           if [ -z "$TAG" ]; then
             TAG="${GITHUB_REF##*/}"
           fi
-          TAG=${TAG/master/latest}
-          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT\
+          echo "REPO_TAG=$TAG" >> $GITHUB_OUTPUT
+
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          ref: "${{ steps.repo_tag.outputs.REPO_TAG }}"
+
+      - name: Update tag info
+        id: image_tag
+        run: |
+          TAG=${{ steps.repo_tag.outputs.REPO_TAG }}
+          TAG=${TAG/main/latest}
+          echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
 
       - name: assert
         run: |
           echo "IMAGE_TAG: ${{ steps.image_tag.outputs.IMAGE_TAG }}"
-          echo "client_payload_tag: "${{ github.event.client_payload.tag }}"
+          echo "client_payload_tag: ${{ github.event.client_payload.tag }}"
