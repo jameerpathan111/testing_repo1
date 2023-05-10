@@ -35,7 +35,7 @@ jobs:
         id: image_tag
         run: |
           TAG=${{ steps.repo_tag.outputs.REPO_TAG }}
-          TAG=${TAG/master/latest}
+          TAG=${TAG/main/latest}
           echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
 
       - name: assert
