@@ -20,7 +20,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v3
 
-      - name: Get image tag
+      - name: Get image tag.
         id: image_tag
         run: |
           TAG="${{ github.event.client_payload.tag }}"
