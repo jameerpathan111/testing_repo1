@@ -3,8 +3,6 @@ name: update_robottelo_image
 
 on:
   push:
-    branches:
-      - branch2
   workflow_dispatch:
 
 jobs:
