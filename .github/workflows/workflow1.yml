@@ -5,11 +5,7 @@ on:
   push:
     branches:
       - main
-      - test
-  repository_dispatch:
-    types:
-      - airgun-pr-merged
-      - nailgun-pr-merged
+  workflow_dispatch:
 
 jobs:
   robottelo_container:
@@ -17,28 +13,23 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Get branch info
-        id: repo_branch
+      - name: Get tag
+        id: repo_tag
         run: |
-          BRANCH="${{ github.event.client_payload.branch }}"
-          if [ -z "$BRANCH" ]; then
-            BRANCH="${GITHUB_REF##*/}"
-          fi
-          echo "REPO_BRANCH=$BRANCH" >> $GITHUB_OUTPUT
+          TAG="${GITHUB_REF##*/}"
+          echo "REPO_TAG=$TAG" >> $GITHUB_OUTPUT
+
       - name: Checkout
         uses: actions/checkout@v3
-        with:
-          ref: "${{ steps.repo_branch.outputs.REPO_BRANCH }}"
 
       - name: Update tag info
         id: image_tag
         run: |
-          TAG="${{ steps.repo_branch.outputs.REPO_BRANCH }}"
+          TAG=${{ steps.repo_tag.outputs.REPO_TAG }}
           TAG=${TAG/main/latest}
           echo "IMAGE_TAG=$TAG" >> $GITHUB_OUTPUT
 
       - name: assert
         run: |
           echo "IMAGE_TAG: ${{ steps.image_tag.outputs.IMAGE_TAG }}"
-          echo "REPO_BRANCH: ${{ steps.repo_branch.outputs.REPO_BRANCH }}"
-          echo "client_payload_tag: ${{ github.event.client_payload.tag }}"
+          echo "GITHUB_REF: ${{ steps.repo_tag.outputs.REPO_TAG }}"
